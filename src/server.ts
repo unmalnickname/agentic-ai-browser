@@ -61,27 +61,33 @@ wss.on('connection', (ws: WebSocket) => {
       if (data.type === 'subscribe' && data.sessionId) {
         sessionId = data.sessionId;
         
-        if (!sessionClients.has(sessionId)) {
+        if (sessionId && !sessionClients.has(sessionId)) {
           sessionClients.set(sessionId, new Set());
         }
         
-        const clients = sessionClients.get(sessionId);
-        if (clients && sessionId) {
-          clients.add(ws);
+        if (sessionId) {
+          const clients = sessionClients.get(sessionId);
+          if (clients) {
+            clients.add(ws);
+          }
         }
         
         // Send initial session data if available
-        const session = sessions.get(sessionId);
-        if (session) {
+        if (sessionId) {
+          const session = sessions.get(sessionId);
+          if (session) {
           ws.send(JSON.stringify({
             type: 'session_update',
             session: sanitizeSession(session)
           }));
+          }
         }
       }
       // Handle browser commands
       else if (data.type === 'command' && sessionId && data.command) {
-        handleBrowserCommand(sessionId, data.command, data.params);
+        if (sessionId) {
+          handleBrowserCommand(sessionId, data.command, data.params);
+        }
       }
     } catch (error) {
       logger.error('WebSocket message error', error);
