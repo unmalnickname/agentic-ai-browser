@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic AI Browser</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script src="app.js" defer></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1><i class="fas fa-robot"></i> Agentic Browser</h1>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-item active" data-view="dashboard">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" data-view="new-session">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>New Session</span>
+                </div>
+                <div class="nav-item" data-view="active-session" style="display: none;">
+                    <i class="fas fa-browser"></i>
+                    <span>Current Session</span>
+                </div>
+                <div class="nav-item" data-view="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </div>
+                <div class="nav-item" data-view="help">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Help</span>
+                </div>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="connection-status">
+                    <div class="status-indicator" id="connection-indicator"></div>
+                    <span id="connection-text">Disconnected</span>
+                </div>
+                <button class="theme-toggle" id="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Mobile Menu Toggle -->
+        <div class="mobile-menu-toggle" id="mobile-menu-toggle" style="display: none;">
+            <i class="fas fa-bars"></i>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard View -->
+            <div class="view active" id="dashboard-view">
+                <div class="d-flex justify-between align-center mb-2">
+                    <h1>Sessions Dashboard</h1>
+                    <button class="btn" id="new-session-btn">
+                        <i class="fas fa-plus"></i> New Session
+                    </button>
+                </div>
+                
+                <div class="sessions-grid" id="sessions-container">
+                    <!-- Sessions will be added here dynamically -->
+                    <div class="card session-card">
+                        <div class="card-header">
+                            <h2>No Active Sessions</h2>
+                        </div>
+                        <div class="card-body text-center">
+                            <p class="text-secondary mb-2">You don't have any active browser sessions.</p>
+                            <button class="btn" id="create-first-session">
+                                <i class="fas fa-plus"></i> Create Your First Session
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Session View -->
+            <div class="view" id="new-session-view">
+                <h1 class="mb-2">Create New Browser Session</h1>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Session Configuration</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="new-session-form">
+                            <div class="form-group">
+                                <label for="session-name">Session Name</label>
+                                <input type="text" id="session-name" class="form-control" placeholder="My Browser Session" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="start-url">Starting URL</label>
+                                <input type="url" id="start-url" class="form-control" placeholder="https://www.example.com" value="https://www.google.com" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="llm-provider">LLM Provider</label>
+                                <select id="llm-provider" class="form-control" required>
+                                    <option value="openai">OpenAI</option>
+                                    <option value="claude">Claude (Anthropic)</option>
+                                    <option value="gemini">Gemini (Google)</option>
+                                    <option value="ollama">Ollama (Local)</option>
+                                    <option value="deepseek">DeepSeek</option>
+                                    <option value="openrouter">OpenRouter</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group" id="model-selection-container">
+                                <label for="model-name">Model</label>
+                                <select id="model-name" class="form-control">
+                                    <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                                    <option value="gpt-4">GPT-4</option>
+                                    <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="session-goal">Session Goal</label>
+                                <textarea id="session-goal" class="form-control" rows="3" placeholder="Describe what you want the AI to accomplish..."></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Advanced Options</label>
+                                <div class="d-flex gap-1">
+                                    <div style="flex: 1;">
+                                        <label for="headless-mode" class="d-flex align-center gap-1">
+                                            <input type="checkbox" id="headless-mode">
+                                            <span>Headless Mode</span>
+                                        </label>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <label for="save-screenshots" class="d-flex align-center gap-1">
+                                            <input type="checkbox" id="save-screenshots" checked>
+                                            <span>Save Screenshots</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-between">
+                                <button type="button" class="btn btn-secondary" id="cancel-new-session">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                                <button type="submit" class="btn">
+                                    <i class="fas fa-play"></i> Start Session
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Session View -->
+            <div class="view" id="active-session-view">
+                <div class="session-header mb-2">
+                    <div class="session-title">
+                        <i class="fas fa-browser"></i>
+                        <span id="session-title-text">Browser Session</span>
+                        <span class="session-status active" id="session-status-badge">Active</span>
+                    </div>
+                    <div class="session-controls">
+                        <button class="btn btn-sm btn-secondary" id="back-to-dashboard">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                        <button class="btn btn-sm btn-danger" id="stop-session">
+                            <i class="fas fa-stop"></i> Stop
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="session-detail">
+                    <div class="session-main">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Browser View</h2>
+                                <button class="btn btn-sm btn-secondary" id="take-screenshot">
+                                    <i class="fas fa-camera"></i> Screenshot
+                                </button>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="browser-view">
+                                    <img id="browser-screenshot" class="browser-screenshot" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600'%3E%3Crect width='800' height='600' fill='%232d2d2d'/%3E%3Ctext x='400' y='300' font-family='Arial' font-size='24' fill='%23757575' text-anchor='middle'%3ENo screenshot available%3C/text%3E%3C/svg%3E" alt="Browser Screenshot">
+                                    
+                                    <div class="browser-controls">
+                                        <div class="browser-url w-100">
+                                            <div class="d-flex gap-1">
+                                                <input type="url" id="navigation-url" class="form-control" placeholder="Enter URL">
+                                                <button class="btn" id="navigate-btn">
+                                                    <i class="fas fa-arrow-right"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Session Logs</h2>
+                                <button class="btn btn-sm btn-secondary" id="clear-logs">
+                                    <i class="fas fa-trash"></i> Clear
+                                </button>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="logs-container" id="logs-container">
+                                    <!-- Logs will be added here dynamically -->
+                                    <div class="log-entry">
+                                        <span class="log-time">00:00:00</span>
+                                        <div class="log-message log-info">Session initialized. Waiting for browser to start...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="message-input">
+                            <input type="text" id="human-message" class="form-control" placeholder="Send a message to the agent...">
+                            <button class="btn" id="send-message">
+                                <i class="fas fa-paper-plane"></i> Send
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="session-sidebar">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Session Info</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="session-info">
+                                    <p>
+                                        <span class="label">Status:</span>
+                                        <span id="status-text" class="text-success">Running</span>
+                                    </p>
+                                    <p>
+                                        <span class="label">Provider:</span>
+                                        <span id="provider-text">OpenAI (GPT-4)</span>
+                                    </p>
+                                    <p>
+                                        <span class="label">Current URL:</span>
+                                        <span id="current-url-text">https://www.google.com</span>
+                                    </p>
+                                    <p>
+                                        <span class="label">Duration:</span>
+                                        <span id="duration-text">00:01:23</span>
+                                    </p>
+                                    <p>
+                                        <span class="label">Progress:</span>
+                                    </p>
+                                    <div class="progress-container">
+                                        <div class="progress-bar" id="session-progress" style="width: 45%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Milestones</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="timeline" id="milestones-container">
+                                    <!-- Milestones will be added here dynamically -->
+                                    <div class="timeline-item">
+                                        <div class="timeline-dot">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                        <div class="timeline-content">
+                                            <div class="timeline-time">00:00:05</div>
+                                            <div class="timeline-title">Session Started</div>
+                                            <div class="timeline-description">Browser session initialized successfully.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings View -->
+            <div class="view" id="settings-view">
+                <h1 class="mb-2">Settings</h1>
+                
+                <div class="card mb-2">
+                    <div class="card-header">
+                        <h2>Appearance</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Theme</label>
+                            <div class="d-flex gap-1">
+                                <button class="btn btn-secondary" id="light-theme-btn">
+                                    <i class="fas fa-sun"></i> Light
+                                </button>
+                                <button class="btn" id="dark-theme-btn">
+                                    <i class="fas fa-moon"></i> Dark
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mb-2">
+                    <div class="card-header">
+                        <h2>LLM Configuration</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="default-provider">Default LLM Provider</label>
+                            <select id="default-provider" class="form-control">
+                                <option value="openai">OpenAI</option>
+                                <option value="claude">Claude (Anthropic)</option>
+                                <option value="gemini">Gemini (Google)</option>
+                                <option value="ollama">Ollama (Local)</option>
+                                <option value="deepseek">DeepSeek</option>
+                                <option value="openrouter">OpenRouter</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="default-model">Default Model</label>
+                            <select id="default-model" class="form-control">
+                                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                                <option value="gpt-4">GPT-4</option>
+                                <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Browser Settings</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="screenshot-quality">Screenshot Quality</label>
+                            <select id="screenshot-quality" class="form-control">
+                                <option value="high">High</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="default-timeout">Default Timeout (seconds)</label>
+                            <input type="number" id="default-timeout" class="form-control" value="30" min="5" max="120">
+                        </div>
+                        
+                        <div class="form-group mb-0">
+                            <button class="btn w-100" id="save-settings">
+                                <i class="fas fa-save"></i> Save Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Help View -->
+            <div class="view" id="help-view">
+                <h1 class="mb-2">Help & Documentation</h1>
+                
+                <div class="card mb-2">
+                    <div class="card-header">
+                        <h2>Getting Started</h2>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="mb-1">What is Agentic AI Browser?</h3>
+                        <p class="mb-2">Agentic AI Browser is an autonomous web browser that uses AI to navigate and interact with websites. It can perform tasks like searching, clicking, typing, and extracting information automatically.</p>
+                        
+                        <h3 class="mb-1">How to Create a Session</h3>
+                        <ol>
+                            <li>Click on "New Session" in the sidebar</li>
+                            <li>Enter a name for your session</li>
+                            <li>Specify the starting URL</li>
+                            <li>Select your preferred LLM provider and model</li>
+                            <li>Describe your goal for the session</li>
+                            <li>Click "Start Session"</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <div class="card mb-2">
+                    <div class="card-header">
+                        <h2>LLM Providers</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-1">The Agentic AI Browser supports multiple LLM providers:</p>
+                        <ul>
+                            <li><strong>OpenAI</strong> - GPT-3.5 and GPT-4 models</li>
+                            <li><strong>Claude (Anthropic)</strong> - Claude and Claude Instant models</li>
+                            <li><strong>Gemini (Google)</strong> - Gemini Pro and Ultra models</li>
+                            <li><strong>Ollama</strong> - Run local models like Llama, Mistral, etc.</li>
+                            <li><strong>DeepSeek</strong> - DeepSeek's advanced models</li>
+                            <li><strong>OpenRouter</strong> - Access multiple models through one API</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Troubleshooting</h2>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="mb-1">Common Issues</h3>
+                        
+                        <h4 class="text-warning">Connection Problems</h4>
+                        <p class="mb-1">If you see a "Disconnected" status:</p>
+                        <ul class="mb-2">
+                            <li>Check your internet connection</li>
+                            <li>Ensure the server is running</li>
+                            <li>Try refreshing the page</li>
+                        </ul>
+                        
+                        <h4 class="text-warning">Browser Not Responding</h4>
+                        <p class="mb-1">If the browser seems stuck:</p>
+                        <ul class="mb-2">
+                            <li>Click the "Stop" button to terminate the session</li>
+                            <li>Start a new session</li>
+                            <li>Check the logs for any error messages</li>
+                        </ul>
+                        
+                        <h4 class="text-warning">API Key Issues</h4>
+                        <p class="mb-1">If you see authentication errors:</p>
+                        <ul>
+                            <li>Verify your API keys are correctly set in the .env file</li>
+                            <li>Ensure you have sufficient credits/quota with your LLM provider</li>
+                            <li>Check if the API endpoint is correct for your region</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Notification Container -->
+    <div class="notification-container" id="notification-container">
+        <!-- Notifications will be added here dynamically -->
+    </div>
+</body>
+</html>

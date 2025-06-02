@@ -1,0 +1,37 @@
+[
+  {
+    "name": "advancedGoogleSearch",
+    "args": ["searchQuery"],
+    "prompt": "You are given a natural language search request like '${searchQuery}'. Your task is to carefully translate it into a Google Search URL using query string parameters. Follow these steps:\n\n1. **Understand the user intent** — determine what kind of content they are looking for (e.g., news, videos, images, scholarly articles, etc.).\n\n2. **Extract key search terms** — identify the nouns and important context words. Clean the phrasing to make an effective search string.\n\n3. **Infer time range** — Look for phrases like 'in 2022', 'past week', 'last month', or specific dates. Convert this to a Google `tbs` format such as:\n   - `tbs=qdr:w` → past week\n   - `tbs=cdr:1,cd_min:01/01/2022,cd_max:12/31/2022` → custom date range\n\n4. **Identify search type** — Determine if the query is about:\n   - News → `tbm=nws`\n   - Images → `tbm=isch`\n   - Videos → `tbm=vid`\n   - Books → `tbm=bks`\n\n5. **Check for regional relevance** — if the prompt includes a country (like Turkey, Japan, etc.), include `cr=countryXX` (e.g., `cr=countryTR` for Turkey).\n\n6. **Construct the full Google Search URL**:\n   - Base: `https://www.google.com/search`\n   - Add the query as `q=...` (URL-encoded)\n   - Add parameters like `tbs`, `tbm`, and optionally `cr` or `lr` as appropriate\n\n7. Once you've built the URL, navigate to it.\n\n💡 **One-shot example**\nUser prompt: \"find me news stories of hotels and expensive housing being built in forest fire areas in Turkey in the year of 2021\"\n\n➡️ Constructed URL:\nhttps://www.google.com/search?q=hotels+expensive+housing+forest+fire+Turkey&tbm=nws&tbs=cdr:1,cd_min:01/01/2021,cd_max:12/31/2021&cr=countryTR\n\nNow go to this URL."
+  },  
+  {
+    "name": "learnJargon", 
+    "args": ["topicOrArea"], 
+    "prompt": "I want to learn the jargon, the glossary of something. For instance if it's a code library, I'd first go to api docs of it to form a base understanding, then maybe look at stackoverflow or smth to see how people use it, then search it on google.com and look at top two results. I'd take notes in between. But if it's a memetic trend, I might look at knowourmeme, write notes, and then do a search on google.com etc. I want you to extrapolate these few shot examples and research the jargon of ${topicOrArea}, and whenever you visit a new source, if you're able to add items to glossary, I want you to write it down in the notes, and then move on to next source. Look at a few places, do some general or specific search on google, click on and read through first 5 results completely, really research the whole thang. take notes so that I can just read it and learn all I need. Once you're done let me know via sendHumanMessage"
+  },
+  {
+    "name": "howToWithThisTech", 
+    "args": ["techToBeUsed", "myUseCase"], 
+    "prompt": "I want to ${myUseCase} using ${techToBeUsed}. Can you go to a search engine website and first search for a basic tutorial for ${techToBeUsed}. Then click on its link and read it to front load your context and reduce hallucination likelihood. Then go to google.com again to see if there's something that is exactly what I'm intending to do, or very close, read that and write down notes. But if there isn't something very close, simply generalize from ${myUseCase} incrementally, performing multiple searches if necessary. Once you have accumulated enough info create a very detailed step by step guide by writing it down via notes action. Feel free to take up to four sequential actions (I suggest you use first turn for making a 3 section plan, then each oof the rest for a section) to prepare the write up. And then discuss with the user via sendHumanMessage."
+  },
+  {
+    "name": "evaluateTechLandscape",
+    "args": ["tech"],
+    "prompt": "You're doing a deep structured analysis of ${tech}. There are three search queries to explore. For each one, visit the top 3 results (1 per turn), take notes after reading each. Keep notes focused but thorough — enough that we could later write an article or decide on adoption.\n\nQueries:\n1. ${tech} site:stackoverflow.com OR site:github.com OR site:reddit.com/r/programming OR site:dev.to OR site:medium.com\n2. ${tech} GitHub OR 'release notes' OR 'roadmap' OR 'changelog'\n3. ${tech} integration OR setup OR compatibility OR usage OR deployment OR architecture\n\nOnce you've visited and taken notes on all 9 results (3 per query), read through your own notes one final time and write a long-form, full-conversation-scale evaluation. Cover: strengths and weaknesses, target use cases, likely pain points, community vibes, current trajectory. Use the note action for each article and the final evaluation. Then sendHumanMessage for discussion."
+  },
+  {
+    "name": "lookIntoTopic",
+    "args": ["topic"],
+    "prompt": "You're helping me understand ${topic} from multiple angles. You'll do 2 rounds of research with 2 search queries each. In each round, visit the top 2 results (1 per turn) and take a short but informative note after reading.\n\nQueries:\n1. ${topic} explained OR overview OR beginner\n2. ${topic} controversy OR debate OR criticism\n\nThen, read your own notes and write a single, thoughtful summary. Cover: what the topic is, what people like about it, any common confusions or disagreements. Keep the final summary casual but clear. Use note for each article and the final piece. Then sendHumanMessage for discussion."
+  },
+  {
+    "name": "investigateFromTrustedSources",
+    "args": ["topic", "urls"],
+    "prompt": "You're going to read investigative articles about ${topic} from a list of trusted sources:\n\n${urls}\n\nVisit each URL one by one (1 per turn). For each one: read the article fully, take a brief note summarizing what unique info or framing it adds (skip redundant info).\n\nAfter you've visited all the links: reread your own notes and write a final synthesis as a note that covers: the most important facts, how each source framed the topic, any noticeable differences in tone or emphasis. Use the note action each time you learn something new. Once you're done with the synthesis, sendHumanMessage for a discussion."
+  },
+  {
+    "name": "compareOpinions",
+    "args": ["subject"],
+    "prompt": "Search '${subject} pros and cons' or '${subject} criticism'. Visit Reddit, HackerNews, StackOverflow, Medium, etc. Take notes on both praise and critique. Cluster views into patterns. Be balanced. When the picture is clear, sendHumanMessage."
+  }
+]
